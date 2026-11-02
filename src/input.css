@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base reset para garantir que nenhum elemento use cantos arredondados por padrão */
+@layer base {
+  * {
+    border-radius: 0px !important;
+  }
+  body {
+    background-color: hsl(214 37% 4%); /* Neutral 950 como fundo padrão */
+    color: hsl(204 60% 97%); /* Neutral 50 para contraste inicial */
+    font-family: "JetBrains Mono", monospace;
+  }
+}
