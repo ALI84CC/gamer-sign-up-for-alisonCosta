@@ -3,6 +3,9 @@ export interface FildsInputProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  name?: string;
+  type?: string;
+  placeholder?: string;
 }
 
 export function FildsInput({
@@ -10,6 +13,9 @@ export function FildsInput({
   value,
   onChange,
   disabled = false,
+  name = "",
+  type = "text",
+  placeholder = "",
 }: FildsInputProps) {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
@@ -19,10 +25,12 @@ export function FildsInput({
     <label>
       {label}
       <input
-        type="text"
+        type={type}
         value={value}
         onChange={handleChange}
         disabled={disabled}
+        name={name || label}
+        placeholder={placeholder}
       />
     </label>
   );
