@@ -1,47 +1,74 @@
 // src/hooks/useSignUpForm.ts
-import { useState, useEffect } from "react";
-
-// Interface que define a estrutura do usuário autenticado
-export interface LoggedUser {
-  name: string;
-  email: string;
-}
+import { useState } from "react";
+import type { FormErrors, FormValues } from "../types/sign-up"; // Importando os tipos criados
 
 export function useSignUpForm() {
-  const [user, setUser] = useState<LoggedUser | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [callSign, setCallSign] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [erros, setErros] = useState<FormErrors>({});
 
-  // Verifica se há um usuário logado ao carregar o app
-  useEffect(() => {
-    const savedUser = localStorage.getItem("shopping_market_user");
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error("Erro ao ler dados de autenticação:", error);
-        localStorage.removeItem("shopping_market_user");
-      }
+  const validarFormulario = (): boolean => {
+    const novosErros: FormErrors = {};
+
+    const regexCallSign = /^[a-zA-Z0-9_-]{3,20}$/;
+    if (!callSign) {
+      novosErros.callsign = "O campo CALL SIGN é obrigatório.";
+    } else if (!regexCallSign.test(callSign)) {
+      novosErros.callsign =
+        "Use entre 3 e 20 caracteres (letras, números, _ ou -).";
     }
-    setIsLoading(false);
-  }, []);
 
-  // Função para efetuar o login / persistir estado
-  const login = (userData: LoggedUser) => {
-    localStorage.setItem("shopping_market_user", JSON.stringify(userData));
-    setUser(userData);
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      novosErros.email = "O campo Email é obrigatório.";
+    } else if (!regexEmail.test(email)) {
+      novosErros.email = "Insira um formato de e-mail válido.";
+    }
+
+    if (!password) {
+      novosErros.password = "A senha é obrigatória.";
+    } else if (password.length < 8) {
+      novosErros.password = "A senha deve conter pelo menos 8 caracteres.";
+    }
+
+    if (!termsAccepted) {
+      novosErros.acceptTerms = "Você precisa aceitar os termos para continuar.";
+    }
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
   };
 
-  // Função para efetuar logout
-  const logout = () => {
-    localStorage.removeItem("shopping_market_user");
-    setUser(null);
+  const lidarComEnvio = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (validarFormulario()) {
+      const dadosFinais: FormValues = {
+        callsign: callSign,
+        email,
+        password,
+        confirmPassword: password,
+        acceptTerms: termsAccepted,
+      };
+
+      console.log("Formulário validado com sucesso! Dados:", dadosFinais);
+      alert("Cadastro do Operador inicializado com sucesso!");
+    }
   };
 
+  // Retorna os estados e as funções para o componente usar
   return {
-    user,
-    isLoggedIn: !!user, // Retorna true se houver um objeto 'user', false se nulo
-    isLoading,
-    login,
-    logout,
+    callSign,
+    setCallSign,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    termsAccepted,
+    setTermsAccepted,
+    erros,
+    lidarComEnvio,
   };
 }

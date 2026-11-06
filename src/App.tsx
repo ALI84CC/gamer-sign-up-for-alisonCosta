@@ -34,7 +34,8 @@ function App() {
     if (!callSign) {
       novosErros.callSign = "O campo CALL SIGN é obrigatório.";
     } else if (!regexCallSign.test(callSign)) {
-      novosErros.callSign = "Use entre 3 e 20 caracteres (letras, números, _ ou -).";
+      novosErros.callSign =
+        "Use entre 3 e 20 caracteres (letras, números, _ ou -).";
     }
 
     // 2. Validação do Email
@@ -58,7 +59,7 @@ function App() {
     }
 
     setErros(novosErros);
-    
+
     // Retorna true se não houver nenhuma propriedade de erro mapeada
     return Object.keys(novosErros).length === 0;
   };
@@ -72,25 +73,35 @@ function App() {
         email,
         password,
         confirmPassword: password, // Mapeado para preencher sua interface de valores
-        acceptTerms: termsAccepted
+        acceptTerms: termsAccepted,
       };
-      
-      console.log("Formulário validado com sucesso! Enviando dados:", dadosFinais);
+
+      console.log(
+        "Formulário validado com sucesso! Enviando dados:",
+        dadosFinais,
+      );
       alert("Cadastro do Operador inicializado com sucesso!");
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
+    <div className="min-h-screen h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
       <h1>Meu Projeto Vite + React + TypeScript</h1>
-      
-      {/* Usamos a tag nativa form com onSubmit controlado para validações síncronas */}
-      <form onSubmit={lidarComEnvio} noValidate>
-        <div>
-          <h1>New Operator</h1>
-          <h2>All Fields Required</h2>
-        </div>
 
+      {/* Usamos a tag nativa form com onSubmit controlado para validações síncronas */}
+      <form
+        onSubmit={lidarComEnvio}
+        noValidate
+        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-lg p-8 shadow-2xl space-y-6"
+      >
+        <div className="space-y-1 border-b border-slate-800 pb-4">
+          <h1 className="text-2xl font-bold tracking-wider text-cyan-400 uppercase">
+            New Operator
+          </h1>
+          <h2 className="text-xs text-slate-400 uppercase tracking-widest">
+            All Fields Required
+          </h2>
+        </div>
         <div>
           <FildsInput
             name="CallSign"
@@ -101,7 +112,11 @@ function App() {
             onChange={(value) => setCallSign(value)}
           />
           <h4>3-20 characters: letters, numbers, _ and -</h4>
-          {erros.callSign && <span style={{ color: 'red', fontSize: '12px' }}>{erros.callSign}</span>}
+          {erros.callSign && (
+            <span style={{ color: "red", fontSize: "12px" }}>
+              {erros.callSign}
+            </span>
+          )}
         </div>
 
         <div>
@@ -113,7 +128,11 @@ function App() {
             value={email}
             onChange={(value) => setEmail(value)}
           />
-          {erros.email && <span style={{ color: 'red', fontSize: '12px' }}>{erros.email}</span>}
+          {erros.email && (
+            <span style={{ color: "red", fontSize: "12px" }}>
+              {erros.email}
+            </span>
+          )}
         </div>
 
         <div>
@@ -126,16 +145,24 @@ function App() {
             onChange={(value) => setPassword(value)}
           />
           <h4>at least 8 characters</h4>
-          {erros.password && <span style={{ color: 'red', fontSize: '12px' }}>{erros.password}</span>}
+          {erros.password && (
+            <span style={{ color: "red", fontSize: "12px" }}>
+              {erros.password}
+            </span>
+          )}
         </div>
 
-        <div style={{ margin: '15px 0' }}>
+        <div style={{ margin: "15px 0" }}>
           <Checkbox
             label="I accept the Terms of Service and Privacy Policy"
             checked={termsAccepted}
             onChange={() => setTermsAccepted((accepted) => !accepted)}
           />
-          {erros.acceptTerms && <div style={{ color: 'red', fontSize: '12px' }}>{erros.acceptTerms}</div>}
+          {erros.acceptTerms && (
+            <div style={{ color: "red", fontSize: "12px" }}>
+              {erros.acceptTerms}
+            </div>
+          )}
         </div>
 
         <Button
@@ -145,7 +172,9 @@ function App() {
           variant="primary"
         />
 
-        <h5>Already have an account? <a href="/login">Login</a></h5>
+        <h5>
+          Already have an account? <a href="/login">Login</a>
+        </h5>
       </form>
     </div>
   );
