@@ -1,100 +1,34 @@
 // src/App.tsx
-import { useState } from "react";
 import { Button } from "./components/Button";
 import { FildsInput } from "./components/FildsInput";
 import { Checkbox } from "./components/Checkbox";
-type FormErrors = {
-  callSign?: string;
-  email?: string;
-  password?: string;
-  acceptTerms?: string;
-};
+import { useSignUpForm } from "./features/sign-up/hooks/useSignUpForm";
 
-type FormValues = {
-  callSign: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
-};
 function App() {
-  const [callSign, setCallSign] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
-
-  // Estado para armazenar os erros de validação baseado na sua interface FormErrors
-  const [erros, setErros] = useState<FormErrors>({});
-
-  const validarFormulario = (): boolean => {
-    const novosErros: FormErrors = {};
-
-    // 1. Validação do Call Sign (3-20 caracteres, letras, números, _ e -)
-    const regexCallSign = /^[a-zA-Z0-9_-]{3,20}$/;
-    if (!callSign) {
-      novosErros.callSign = "O campo CALL SIGN é obrigatório.";
-    } else if (!regexCallSign.test(callSign)) {
-      novosErros.callSign =
-        "Use entre 3 e 20 caracteres (letras, números, _ ou -).";
-    }
-
-    // 2. Validação do Email
-    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      novosErros.email = "O campo Email é obrigatório.";
-    } else if (!regexEmail.test(email)) {
-      novosErros.email = "Insira um formato de e-mail válido.";
-    }
-
-    // 3. Validação de Senha (mínimo 8 caracteres)
-    if (!password) {
-      novosErros.password = "A senha é obrigatória.";
-    } else if (password.length < 8) {
-      novosErros.password = "A senha deve conter pelo menos 8 caracteres.";
-    }
-
-    // 4. Validação dos Termos
-    if (!termsAccepted) {
-      novosErros.acceptTerms = "Você precisa aceitar os termos para continuar.";
-    }
-
-    setErros(novosErros);
-
-    // Retorna true se não houver nenhuma propriedade de erro mapeada
-    return Object.keys(novosErros).length === 0;
-  };
-
-  const lidarComEnvio = (event: React.FormEvent) => {
-    event.preventDefault(); // Impede o recarregamento tradicional da página
-
-    if (validarFormulario()) {
-      const dadosFinais: FormValues = {
-        callSign,
-        email,
-        password,
-        confirmPassword: password, // Mapeado para preencher sua interface de valores
-        acceptTerms: termsAccepted,
-      };
-
-      console.log(
-        "Formulário validado com sucesso! Enviando dados:",
-        dadosFinais,
-      );
-      alert("Cadastro do Operador inicializado com sucesso!");
-    }
-  };
+  // Consumindo toda a lógica isolada do nosso hook customizado
+  const {
+    callSign,
+    setCallSign,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    termsAccepted,
+    setTermsAccepted,
+    erros,
+    passwordStrength,
+    lidarComEnvio,
+  } = useSignUpForm();
 
   return (
-    <div className="min-h-screen h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
-      <h1>Meu Projeto Vite + React + TypeScript</h1>
-
-      {/* Usamos a tag nativa form com onSubmit controlado para validações síncronas */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
       <form
         onSubmit={lidarComEnvio}
         noValidate
-        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-lg p-8 shadow-2xl space-y-6"
+        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-lg p-8 shadow-2xl space-y-5"
       >
-        <div className="space-y-1 border-b border-slate-800 pb-4">
+        {/* Cabeçalho */}
+        <div className="space-y-1 border-b border-slate-800 pb-4 mb-2">
           <h1 className="text-2xl font-bold tracking-wider text-cyan-400 uppercase">
             New Operator
           </h1>
@@ -102,78 +36,108 @@ function App() {
             All Fields Required
           </h2>
         </div>
-        <div>
+
+        {/* Input: Call Sign */}
+        <div className="space-y-1">
           <FildsInput
-            name="CallSign"
-            type="text"
-            placeholder="e.g. Vortex_07"
             label="CALL SIGN"
+            placeholder="e.g. Vortex_07"
             value={callSign}
-            onChange={(value) => setCallSign(value)}
+            onChange={setCallSign}
+            erro={erros.callsign}
           />
-          <h4>3-20 characters: letters, numbers, _ and -</h4>
-          {erros.callSign && (
-            <span style={{ color: "red", fontSize: "12px" }}>
-              {erros.callSign}
-            </span>
-          )}
+          <h4 className="text-[10px] text-slate-500 uppercase tracking-wide">
+            3-20 characters: letters, numbers, _ and -
+          </h4>
         </div>
 
-        <div>
-          <FildsInput
-            name="Email"
-            type="email"
-            placeholder="e.g. john.doe@example.com"
-            label="Email"
-            value={email}
-            onChange={(value) => setEmail(value)}
-          />
-          {erros.email && (
-            <span style={{ color: "red", fontSize: "12px" }}>
-              {erros.email}
-            </span>
-          )}
-        </div>
+        {/* Input: Email */}
+        <FildsInput
+          label="Email"
+          type="email"
+          placeholder="e.g. john.doe@example.com"
+          value={email}
+          onChange={setEmail}
+          erro={erros.email}
+        />
 
-        <div>
+        {/* Input: Password */}
+        <div className="space-y-1">
           <FildsInput
-            name="passw"
+            label="Password"
             type="password"
             placeholder="e.g. ••••••••"
-            label="Password"
             value={password}
-            onChange={(value) => setPassword(value)}
+            onChange={setPassword}
+            erro={erros.password}
           />
-          <h4>at least 8 characters</h4>
-          {erros.password && (
-            <span style={{ color: "red", fontSize: "12px" }}>
-              {erros.password}
-            </span>
+          {/* Estrutura Visual do Medidor de Força */}
+          {password && (
+            <div className="space-y-1.5 animate-fadeIn">
+              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                <span className="text-slate-500">Security Level:</span>
+                <span
+                  className={`
+          ${passwordStrength === "Weak" && "text-rose-500"}
+          ${passwordStrength === "Fair" && "text-amber-500"}
+          ${passwordStrength === "Good" && "text-lime-500"}
+          ${passwordStrength === "Strong" && "text-emerald-400"}
+        `}
+                >
+                  {passwordStrength}
+                </span>
+              </div>
+
+              {/* Linha indicadora segmentada */}
+              <div className="grid grid-cols-4 gap-1 h-1 w-full bg-slate-950 rounded overflow-hidden">
+                <div
+                  className={`h-full transition-colors duration-300 ${password ? (passwordStrength === "Weak" ? "bg-rose-500" : passwordStrength === "Fair" ? "bg-amber-500" : passwordStrength === "Good" ? "bg-lime-500" : "bg-emerald-400") : "bg-transparent"}`}
+                />
+                <div
+                  className={`h-full transition-colors duration-300 ${password && passwordStrength !== "Weak" ? (passwordStrength === "Fair" ? "bg-amber-500" : passwordStrength === "Good" ? "bg-lime-500" : "bg-emerald-400") : "bg-slate-900"}`}
+                />
+                <div
+                  className={`h-full transition-colors duration-300 ${password && (passwordStrength === "Good" || passwordStrength === "Strong") ? (passwordStrength === "Good" ? "bg-lime-500" : "bg-emerald-400") : "bg-slate-900"}`}
+                />
+                <div
+                  className={`h-full transition-colors duration-300 ${password && passwordStrength === "Strong" ? "bg-emerald-400" : "bg-slate-900"}`}
+                />
+              </div>
+            </div>
           )}
+          <h4 className="text-[10px] text-slate-500 uppercase tracking-wide">
+            At least 8 characters
+          </h4>
         </div>
 
-        <div style={{ margin: "15px 0" }}>
+        {/* Componente Checkbox */}
+        <div className="pt-2">
           <Checkbox
             label="I accept the Terms of Service and Privacy Policy"
             checked={termsAccepted}
             onChange={() => setTermsAccepted((accepted) => !accepted)}
+            erro={erros.acceptTerms}
           />
-          {erros.acceptTerms && (
-            <div style={{ color: "red", fontSize: "12px" }}>
-              {erros.acceptTerms}
-            </div>
-          )}
         </div>
 
-        <Button
-          texto="Initialize Account"
-          disabled={!termsAccepted}
-          onClick={() => void 0}
-          variant="primary"
-        />
+        {/* Componente Button */}
+        <div className="pt-2">
+          <Button
+            texto="Initialize Account"
+            disabled={!termsAccepted}
+            onClick={() => void 0}
+            variant="primary"
+          />
+        </div>
 
-        <h5>
-          Already have an account? <a href="/login">Login</a>
+        <h5 className="text-center text-xs text-slate-500 pt-2">
+          Already have an account?{" "}
+          <a
+            href="/login"
+            className="text-cyan-400 hover:underline transition-all"
+          >
+            Login
+          </a>
         </h5>
       </form>
     </div>
