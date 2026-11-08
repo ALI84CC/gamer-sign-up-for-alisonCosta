@@ -2,7 +2,7 @@
 import { Button } from "./components/Button";
 import { FildsInput } from "./components/FildsInput";
 import { Checkbox } from "./components/Checkbox";
-import { useSignUpForm } from "../src/features/sign-up/hooks/useSignUpForm";
+import { useSignUpForm } from "./features/sign-up/hooks/useSignUpForm";
 
 function App() {
   const {
@@ -12,6 +12,8 @@ function App() {
     setEmail,
     password,
     setPassword,
+    confirmPassword,
+    setConfirmPassword, // Adicionado aqui
     termsAccepted,
     setTermsAccepted,
     erros,
@@ -19,18 +21,17 @@ function App() {
     lidarComEnvio,
   } = useSignUpForm();
 
-  // Computando dinamicamente o progresso do Operador para o painel esquerdo
+  // Atualizado para 5 checagens reais de validação
   const totalValidos = [
-    callSign.length >= 3 && callSign.length <= 20,
+    /^[a-zA-Z0-9_-]{3,20}$/.test(callSign),
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
     password.length >= 8,
-    password.length >= 8, // Representando a confirmação
+    password.length >= 8 && password === confirmPassword,
     termsAccepted,
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-nexus-bg text-slate-200 font-mono flex items-center justify-center p-4 md:p-8 selection:bg-nexus-accent selection:text-black">
-      {/* Container Central Duplo */}
+    <div className="min-h-screen bg-nexus-bg text-slate-200 font-mono flex items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-5xl grid md:grid-cols-12 gap-8 items-center">
         {/* COLUNA ESQUERDA: Status do Nexus */}
         <div className="md:col-span-5 space-y-12 pr-4 text-left">
@@ -50,12 +51,8 @@ function App() {
                 NEXUS
               </span>
             </h1>
-            <p className="text-xs text-nexus-muted uppercase tracking-widest">
-              Initialize your neoncore identity
-            </p>
           </div>
 
-          {/* Painel Tático de Progresso (Muda dinamicamente baseado nos inputs!) */}
           <div className="border-t border-nexus-border pt-6 space-y-4">
             <div className="flex justify-between items-end">
               <div>
@@ -71,18 +68,17 @@ function App() {
               </span>
             </div>
 
-            {/* Checklist de Carregamento de Módulos */}
             <div className="space-y-1.5 text-xs text-nexus-muted uppercase">
               <div className="flex justify-between border-b border-nexus-border/30 py-1">
                 <span>CALLSIGN</span>
                 <span
                   className={
-                    callSign.length >= 3
+                    /^[a-zA-Z0-9_-]{3,20}$/.test(callSign)
                       ? "text-nexus-strong"
-                      : "text-nexus-weak animate-pulse"
+                      : "text-nexus-muted"
                   }
                 >
-                  {callSign.length >= 3 ? "OK" : "PENDING"}
+                  {/^[a-zA-Z0-9_-]{3,20}$/.test(callSign) ? "OK" : "PENDING"}
                 </span>
               </div>
               <div className="flex justify-between border-b border-nexus-border/30 py-1">
@@ -110,6 +106,20 @@ function App() {
                 </span>
               </div>
               <div className="flex justify-between border-b border-nexus-border/30 py-1">
+                <span>CONFIRMATION</span>
+                <span
+                  className={
+                    password.length >= 8 && password === confirmPassword
+                      ? "text-nexus-strong"
+                      : "text-nexus-muted"
+                  }
+                >
+                  {password.length >= 8 && password === confirmPassword
+                    ? "OK"
+                    : "PENDING"}
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-nexus-border/30 py-1">
                 <span>TERMS</span>
                 <span
                   className={
@@ -123,9 +133,8 @@ function App() {
           </div>
         </div>
 
-        {/* COLUNA DIREITA: Caixa do Formulário (Cantos de Mira Laser) */}
+        {/* COLUNA DIREITA: Caixa do Formulário */}
         <div className="md:col-span-7 relative bg-nexus-card border border-nexus-border p-8 rounded-none shadow-2xl">
-          {/* Decorações angulares de interface futurista (Cantos amarelos dos prints) */}
           <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-nexus-accent -mt-[1px] -ml-[1px]" />
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-nexus-accent -mb-[1px] -mr-[1px]" />
 
@@ -139,17 +148,15 @@ function App() {
               </span>
             </div>
 
-            {/* Call Sign Input */}
             <FildsInput
               label="CALLSIGN"
               placeholder="e.g. Vortex_07"
               value={callSign}
               onChange={setCallSign}
               erro={erros.callsign}
-              sucesso={callSign.length >= 3}
+              sucesso={/^[a-zA-Z0-9_-]{3,20}$/.test(callSign)}
             />
 
-            {/* Email Input */}
             <FildsInput
               label="EMAIL"
               type="email"
@@ -160,7 +167,6 @@ function App() {
               sucesso={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
             />
 
-            {/* Password Input com Barra de Força Dinâmica */}
             <div className="space-y-2">
               <FildsInput
                 label="PASSWORD"
@@ -204,6 +210,17 @@ function App() {
               )}
             </div>
 
+            {/* NOVO CAMPO: Confirm Password */}
+            <FildsInput
+              label="CONFIRM PASSWORD"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              erro={erros.confirmPassword}
+              sucesso={password.length >= 8 && password === confirmPassword}
+            />
+
             <div className="pt-2">
               <Checkbox
                 label="I accept the Terms of Service and Privacy Policy"
@@ -213,7 +230,6 @@ function App() {
               />
             </div>
 
-            {/* Botão de Inicialização Neon */}
             <div className="pt-4">
               <Button
                 texto="Initialize Account"

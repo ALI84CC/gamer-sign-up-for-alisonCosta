@@ -10,6 +10,7 @@ export function useSignUpForm() {
   const [callSign, setCallSign] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [erros, setErros] = useState<FormErrors>({});
 
@@ -47,29 +48,39 @@ export function useSignUpForm() {
   const validarFormulario = (): boolean => {
     const novosErros: FormErrors = {};
 
+    // 1. Validação do Call Sign
     const regexCallSign = /^[a-zA-Z0-9_-]{3,20}$/;
     if (!callSign) {
-      novosErros.callsign = "O campo CALL SIGN é obrigatório.";
+      novosErros.callsign = "REQUIRED";
     } else if (!regexCallSign.test(callSign)) {
-      novosErros.callsign =
-        "Use entre 3 e 20 caracteres (letras, números, _ ou -).";
+      novosErros.callsign = "INVALID FORMAT";
     }
 
+    // 2. Validação do Email
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      novosErros.email = "O campo Email é obrigatório.";
+      novosErros.email = "REQUIRED";
     } else if (!regexEmail.test(email)) {
-      novosErros.email = "Insira um formato de e-mail válido.";
+      novosErros.email = "MALFORMED";
     }
 
+    // 3. Validação da Senha
     if (!password) {
-      novosErros.password = "A senha é obrigatória.";
+      novosErros.password = "REQUIRED";
     } else if (password.length < 8) {
-      novosErros.password = "A senha deve conter pelo menos 8 caracteres.";
+      novosErros.password = "TOO SHORT";
     }
 
+    // 4. Validação da Confirmação de Senha
+    if (!confirmPassword) {
+      novosErros.confirmPassword = "REQUIRED";
+    } else if (password !== confirmPassword) {
+      novosErros.confirmPassword = "MISMATCH";
+    }
+
+    // 5. Validação dos Termos
     if (!termsAccepted) {
-      novosErros.acceptTerms = "Você precisa aceitar os termos para continuar.";
+      novosErros.acceptTerms = "REQUIRED";
     }
 
     setErros(novosErros);
@@ -78,18 +89,16 @@ export function useSignUpForm() {
 
   const lidarComEnvio = (event: React.FormEvent) => {
     event.preventDefault();
-
     if (validarFormulario()) {
       const dadosFinais: FormValues = {
         callsign: callSign,
         email,
         password,
-        confirmPassword: password,
+        confirmPassword,
         acceptTerms: termsAccepted,
       };
-
-      console.log("Formulário validado com sucesso! Dados:", dadosFinais);
-      alert("Cadastro do Operador inicializado com sucesso!");
+      console.log("Transmission Successful:", dadosFinais);
+      alert("OPERATOR INITIALIZED SUCCESSFULLY");
     }
   };
 
@@ -100,10 +109,12 @@ export function useSignUpForm() {
     setEmail,
     password,
     setPassword,
+    confirmPassword,
+    setConfirmPassword, // Retornado
     termsAccepted,
     setTermsAccepted,
     erros,
-    passwordStrength, // Retornando o nível calculado para a interface usar
+    passwordStrength,
     lidarComEnvio,
   };
 }
