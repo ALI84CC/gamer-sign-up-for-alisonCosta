@@ -1182,6 +1182,10 @@ body {
   transition-duration: 300ms;
 }
 
+.duration-200 {
+  transition-duration: 200ms;
+}
+
 /* Base reset para garantir que nenhum elemento use cantos arredondados por padrão */
 
 .selection\:text-black *::-moz-selection {
@@ -1202,6 +1206,11 @@ body {
 .selection\:text-black::selection {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity, 1));
+}
+
+.hover\:border-slate-300:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(203 213 225 / var(--tw-border-opacity, 1));
 }
 
 .hover\:bg-cyan-400:hover {
