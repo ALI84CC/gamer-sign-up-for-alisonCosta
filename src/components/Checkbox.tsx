@@ -1,10 +1,11 @@
 // src/components/Checkbox.tsx
-import React from "react";
+import React, { type ChangeEvent } from "react";
 
 export interface CheckboxProps {
+  name: string;
   label: string;
   checked: boolean;
-  onChange: (checked: boolean) => void;
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   erro?: string; // 1. Mapeie a propriedade opcional de erro na interface
 }
@@ -17,7 +18,7 @@ export function Checkbox({
   erro, // 2. Desestruture o erro aqui para utilizá-lo no componente
 }: CheckboxProps) {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.checked);
+    onChange?.(event);
   };
 
   return (
@@ -27,6 +28,7 @@ export function Checkbox({
       >
         <div className="relative flex items-center h-5">
           <input
+            name=""
             type="checkbox"
             checked={checked}
             onChange={handleChange}

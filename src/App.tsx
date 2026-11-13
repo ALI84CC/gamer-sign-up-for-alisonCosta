@@ -3,142 +3,60 @@ import { Button } from "./components/Button";
 import { FildsInput } from "./components/FildsInput";
 import { Checkbox } from "./components/Checkbox";
 import { useSignUpForm } from "./features/sign-up/hooks/useSignUpForm";
+import { PasswordMeter } from "./features/sign-up/components/PasswordMeter";
+import { OperatorStatus } from "./features/sign-up/components/OperatorStatus";
 
 function App() {
   const {
-    callSign,
-    setCallSign,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword, // Adicionado aqui
-    termsAccepted,
-    setTermsAccepted,
-    erros,
+    values,
+    touched,
+    errors,
     passwordStrength,
-    lidarComEnvio,
+    isSubmitting,
+    isSuccess,
+    handleChange,
+    handleBlur,
+    handleSubmit,
   } = useSignUpForm();
 
-  // Atualizado para 5 checagens reais de validação
-  const totalValidos = [
-    /^[a-zA-Z0-9_-]{3,20}$/.test(callSign),
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
-    password.length >= 8,
-    password.length >= 8 && password === confirmPassword,
-    termsAccepted,
-  ].filter(Boolean).length;
+  const validations = {
+    callsign: /^[a-zA-Z0-9_-]{3,20}$/.test(values.callsign.trim()),
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email),
+    password: values.password.length >= 8,
+    confirmation:
+      values.password.length >= 8 && values.password === values.confirmPassword,
+    terms: values.terms,
+  };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-nexus-bg text-slate-200 font-mono flex items-center justify-center p-4 md:p-8">
+        <div className="w-full max-w-md bg-nexus-card border border-nexus-border p-8 text-center relative">
+          <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-nexus-accent -mt-[1px] -ml-[1px]" />
+          <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-nexus-accent -mb-[1px] -mr-[1px]" />
+          <h1 className="text-2xl font-black text-nexus-strong uppercase mb-4">
+            // REGISTRATION COMPLETE
+          </h1>
+          <p className="text-xs text-nexus-muted uppercase">
+            Welcome to the NEONCORE network, Operator.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-nexus-bg text-slate-200 font-mono flex items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-5xl grid md:grid-cols-12 gap-8 items-center">
-        {/* COLUNA ESQUERDA: Status do Nexus */}
-        <div className="md:col-span-5 space-y-12 pr-4 text-left">
-          <div className="flex items-center space-x-2">
-            <div className="w-5 h-5 border border-nexus-accent flex items-center justify-center p-0.5 rounded-full">
-              <div className="w-2 h-2 bg-nexus-accent rounded-full animate-pulse" />
-            </div>
-            <span className="text-sm font-bold tracking-widest uppercase text-slate-100">
-              NEONCORE
-            </span>
-          </div>
+        {/* COLUNA ESQUERDA */}
+        <OperatorStatus callsign={values.callsign} validations={validations} />
 
-          <div className="space-y-3">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase text-slate-100 leading-none">
-              // JOIN THE <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-nexus-muted">
-                NEXUS
-              </span>
-            </h1>
-          </div>
-
-          <div className="border-t border-nexus-border pt-6 space-y-4">
-            <div className="flex justify-between items-end">
-              <div>
-                <span className="text-[10px] text-nexus-muted block uppercase">
-                  OPERATOR ID
-                </span>
-                <span className="text-xl font-bold tracking-wide uppercase text-slate-100">
-                  {callSign || "UNASSIGNED"}
-                </span>
-              </div>
-              <span className="text-xs text-nexus-accent font-bold">
-                {totalValidos}/5 READY
-              </span>
-            </div>
-
-            <div className="space-y-1.5 text-xs text-nexus-muted uppercase">
-              <div className="flex justify-between border-b border-nexus-border/30 py-1">
-                <span>CALLSIGN</span>
-                <span
-                  className={
-                    /^[a-zA-Z0-9_-]{3,20}$/.test(callSign)
-                      ? "text-nexus-strong"
-                      : "text-nexus-muted"
-                  }
-                >
-                  {/^[a-zA-Z0-9_-]{3,20}$/.test(callSign) ? "OK" : "PENDING"}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-nexus-border/30 py-1">
-                <span>EMAIL</span>
-                <span
-                  className={
-                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-                      ? "text-nexus-strong"
-                      : "text-nexus-muted"
-                  }
-                >
-                  {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "OK" : "PENDING"}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-nexus-border/30 py-1">
-                <span>PASSWORD</span>
-                <span
-                  className={
-                    password.length >= 8
-                      ? "text-nexus-strong"
-                      : "text-nexus-muted"
-                  }
-                >
-                  {password.length >= 8 ? "OK" : "PENDING"}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-nexus-border/30 py-1">
-                <span>CONFIRMATION</span>
-                <span
-                  className={
-                    password.length >= 8 && password === confirmPassword
-                      ? "text-nexus-strong"
-                      : "text-nexus-muted"
-                  }
-                >
-                  {password.length >= 8 && password === confirmPassword
-                    ? "OK"
-                    : "PENDING"}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-nexus-border/30 py-1">
-                <span>TERMS</span>
-                <span
-                  className={
-                    termsAccepted ? "text-nexus-strong" : "text-nexus-muted"
-                  }
-                >
-                  {termsAccepted ? "OK" : "REQUIRED"}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* COLUNA DIREITA: Caixa do Formulário */}
-        <div className="md:col-span-7 relative bg-nexus-card border border-nexus-border p-8 rounded-none shadow-2xl">
+        {/* COLUNA DIREITA: Formulário */}
+        <div className="md:col-span-7 relative bg-nexus-card border border-nexus-border p-8 shadow-2xl">
           <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-nexus-accent -mt-[1px] -ml-[1px]" />
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-nexus-accent -mb-[1px] -mr-[1px]" />
 
-          <form onSubmit={lidarComEnvio} noValidate className="space-y-5">
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <div className="flex justify-between items-center border-b border-nexus-border pb-4 mb-2 text-left">
               <h2 className="text-sm font-bold tracking-wider text-slate-300 uppercase">
                 New Operator
@@ -150,104 +68,69 @@ function App() {
 
             <FildsInput
               label="CALLSIGN"
+              name="callsign"
               placeholder="e.g. Vortex_07"
-              value={callSign}
-              onChange={setCallSign}
-              erro={erros.callsign}
-              sucesso={/^[a-zA-Z0-9_-]{3,20}$/.test(callSign)}
+              value={values.callsign}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              erro={errors.callsign}
+              sucesso={validations.callsign && touched.callsign}
             />
 
             <FildsInput
               label="EMAIL"
+              name="email"
               type="email"
               placeholder="you@example.com"
-              value={email}
-              onChange={setEmail}
-              erro={erros.email}
-              sucesso={/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              erro={errors.email}
+              sucesso={validations.email && touched.email}
             />
 
             <div className="space-y-2">
               <FildsInput
                 label="PASSWORD"
+                name="password"
                 type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={setPassword}
-                erro={erros.password}
+                value={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                erro={errors.password}
+                sucesso={validations.password && touched.password}
               />
 
-              {password && (
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-[10px] font-bold uppercase">
-                    <span className="text-nexus-muted">Security Level:</span>
-                    <span
-                      className={`
-                      ${passwordStrength === "Weak" && "text-nexus-weak"}
-                      ${passwordStrength === "Fair" && "text-fair"}
-                      ${passwordStrength === "Good" && "text-good"}
-                      ${passwordStrength === "Strong" && "text-nexus-strong"}
-                    `}
-                    >
-                      {passwordStrength}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1 h-1 w-full bg-black rounded-none overflow-hidden">
-                    <div
-                      className={`h-full transition-colors duration-300 ${passwordStrength === "Weak" ? "bg-nexus-weak" : passwordStrength === "Fair" ? "bg-fair" : passwordStrength === "Good" ? "bg-good" : "bg-nexus-strong"}`}
-                    />
-                    <div
-                      className={`h-full transition-colors duration-300 ${passwordStrength !== "Weak" ? (passwordStrength === "Fair" ? "bg-fair" : passwordStrength === "Good" ? "bg-good" : "bg-nexus-strong") : "bg-nexus-border"}`}
-                    />
-                    <div
-                      className={`h-full transition-colors duration-300 ${passwordStrength === "Good" || passwordStrength === "Strong" ? (passwordStrength === "Good" ? "bg-good" : "bg-nexus-strong") : "bg-nexus-border"}`}
-                    />
-                    <div
-                      className={`h-full transition-colors duration-300 ${passwordStrength === "Strong" ? "bg-nexus-strong" : "bg-nexus-border"}`}
-                    />
-                  </div>
-                </div>
-              )}
+              <PasswordMeter
+                password={values.password}
+                strength={passwordStrength}
+              />
             </div>
 
-            {/* NOVO CAMPO: Confirm Password */}
             <FildsInput
               label="CONFIRM PASSWORD"
+              name="confirmPassword"
               type="password"
               placeholder="••••••••"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              erro={erros.confirmPassword}
-              sucesso={password.length >= 8 && password === confirmPassword}
+              value={values.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              erro={errors.confirmPassword}
+              sucesso={validations.confirmation && touched.confirmPassword}
             />
 
-            <div className="pt-2">
-              <Checkbox
-                label="I accept the Terms of Service and Privacy Policy"
-                checked={termsAccepted}
-                onChange={() => setTermsAccepted((v) => !v)}
-                erro={erros.acceptTerms}
-              />
-            </div>
+            <Checkbox
+              label="I accept the NEONCORE Terms of Service and Privacy Policy"
+              name="terms"
+              checked={values.terms}
+              onChange={handleChange}
+              erro={errors.terms}
+            />
 
-            <div className="pt-4">
-              <Button
-                texto="Initialize Account"
-                disabled={totalValidos < 5}
-                onClick={() => void 0}
-                variant={totalValidos === 5 ? "primary" : "secondary"}
-              />
-            </div>
-
-            <h5 className="text-center text-xs text-nexus-muted pt-2 uppercase tracking-wide">
-              Already an operator?{" "}
-              <a
-                href="/login"
-                className="text-nexus-accent hover:underline transition-all font-bold"
-              >
-                Log in
-              </a>
-            </h5>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Transmitting_" : "Submit Operator"}
+            </Button>
           </form>
         </div>
       </div>

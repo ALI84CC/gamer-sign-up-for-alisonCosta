@@ -1,10 +1,12 @@
 // src/components/FildsInput.tsx
-import React from "react";
+import React, { type ChangeEvent } from "react";
 
 export interface FildsInputProps {
+  name: string;
   label: string;
   value: string;
-  onChange: (value: string) => void;
+  onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   placeholder?: string;
   type?: string;
@@ -13,6 +15,7 @@ export interface FildsInputProps {
 }
 
 export function FildsInput({
+  name,
   label,
   value,
   onChange,
@@ -23,7 +26,7 @@ export function FildsInput({
   sucesso,
 }: FildsInputProps) {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
+    onChange?.(event);
   };
 
   return (
@@ -34,6 +37,7 @@ export function FildsInput({
 
       <div className="relative">
         <input
+          name={name}
           type={type}
           value={value}
           onChange={handleChange}
