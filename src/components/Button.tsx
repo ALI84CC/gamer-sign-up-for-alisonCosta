@@ -4,6 +4,7 @@ import type { MouseEvent, ReactNode } from "react";
 export interface ButtonProps {
   texto?: string;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
+  MouseOver?: (event: MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   variant?: "primary" | "secondary";
   type?: "button" | "submit" | "reset";
@@ -13,6 +14,7 @@ export interface ButtonProps {
 export function Button({
   texto,
   onClick,
+  MouseOver,
   disabled,
   variant = "primary",
   children,
@@ -22,6 +24,7 @@ export function Button({
     <button
       type={type}
       onClick={onClick}
+      onMouseOver={onClick}
       disabled={disabled}
       className={`w-full font-bold uppercase tracking-wider text-sm py-3 rounded transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed
         ${

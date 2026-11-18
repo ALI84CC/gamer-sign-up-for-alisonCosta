@@ -37,6 +37,7 @@ export function useSignUpForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   // Deriva a força da senha em tempo real baseado no valor atual
   const passwordStrength = calculateStrength(values.password);
@@ -182,7 +183,7 @@ export function useSignUpForm() {
       });
 
       // Aqui, futuramente interceptaremos com o leitor de telas (Acessibilidade)
-      console.log(
+      setStatusMessage(
         `${Object.keys(validationErrors).length} fields need attention.`,
       );
       return;
@@ -199,6 +200,24 @@ export function useSignUpForm() {
     }, 2000);
   };
 
+  const resetForm = () => {
+    setValues({
+      callsign: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+    });
+    setTouched({
+      callsign: false,
+      email: false,
+      password: false,
+      confirmPassword: false,
+    });
+    setErrors({});
+    setIsSuccess(false);
+  };
+
   return {
     values,
     touched,
@@ -209,5 +228,7 @@ export function useSignUpForm() {
     handleChange,
     handleBlur,
     handleSubmit,
+    resetForm,
+    statusMessage,
   };
 }

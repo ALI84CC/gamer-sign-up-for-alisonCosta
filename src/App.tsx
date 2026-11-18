@@ -17,6 +17,8 @@ function App() {
     handleChange,
     handleBlur,
     handleSubmit,
+    statusMessage,
+    resetForm,
   } = useSignUpForm();
 
   const validations = {
@@ -37,9 +39,16 @@ function App() {
           <h1 className="text-2xl font-black text-nexus-strong uppercase mb-4">
             // REGISTRATION COMPLETE
           </h1>
-          <p className="text-xs text-nexus-muted uppercase">
-            Welcome to the NEONCORE network, Operator.
+          <p className="text-xs text-nexus-muted uppercase mb-6">
+            Welcome to the NEONCORE network,{" "}
+            <span className="text-nexus-accent font-bold">
+              {values.callsign}
+            </span>
+            .
           </p>
+          <Button type="button" onClick={resetForm}>
+            New Registration
+          </Button>
         </div>
       </div>
     );
@@ -56,6 +65,9 @@ function App() {
           <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-nexus-accent -mt-[1px] -ml-[1px]" />
           <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-nexus-accent -mb-[1px] -mr-[1px]" />
 
+          <div aria-live="polite" className="sr-only">
+            {statusMessage}
+          </div>
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <div className="flex justify-between items-center border-b border-nexus-border pb-4 mb-2 text-left">
               <h2 className="text-sm font-bold tracking-wider text-slate-300 uppercase">
