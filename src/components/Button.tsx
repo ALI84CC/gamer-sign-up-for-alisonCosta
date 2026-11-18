@@ -14,7 +14,6 @@ export interface ButtonProps {
 export function Button({
   texto,
   onClick,
-  MouseOver,
   disabled,
   variant = "primary",
   children,

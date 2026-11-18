@@ -28,7 +28,7 @@ export function Checkbox({
       >
         <div className="relative flex items-center h-5">
           <input
-            name=""
+            name="terms"
             type="checkbox"
             checked={checked}
             onChange={handleChange}
